@@ -291,6 +291,10 @@ export async function restartApp() {
   return commands.restartApp()
 }
 
+export async function isPacmanPackage() {
+  return commands.isPacmanPackage()
+}
+
 export async function installUpdate(
   version: string,
   onEvent: (event: DownloadEvent) => void,

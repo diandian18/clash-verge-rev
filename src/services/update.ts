@@ -7,6 +7,10 @@ import { compareVersions as compareSemver } from 'compare-versions'
 
 import { version as appVersion } from '@root/package.json'
 
+import { isPacmanPackage } from './cmds'
+
+type AppUpdate = Update & { managedByPacman: boolean }
+
 const SEMVER_FULL_REGEX =
   /^\d+(?:\.\d+){1,2}(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$/
 const SEMVER_SEARCH_REGEX =
@@ -71,7 +75,8 @@ const localVersionNormalized = normalizeVersion(appVersion)
 
 export const checkUpdateSafe = async (
   options?: CheckOptions,
-): Promise<Update | null> => {
+): Promise<AppUpdate | null> => {
+  const managedByPacman = await isPacmanPackage()
   const result = await check(options ?? {})
   if (!result) return null
 
@@ -91,7 +96,7 @@ export const checkUpdateSafe = async (
     return null
   }
 
-  return result
+  return Object.assign(result, { managedByPacman })
 }
 
 export type { CheckOptions }

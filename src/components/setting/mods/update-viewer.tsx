@@ -1,4 +1,4 @@
-import { alpha, Box, Button, LinearProgress } from '@mui/material'
+import { Alert, alpha, Box, Button, LinearProgress } from '@mui/material'
 import { useLockFn } from 'ahooks'
 import type { Ref } from 'react'
 import {
@@ -238,6 +238,12 @@ export function UpdateViewer({ ref }: { ref?: Ref<DialogRef> }) {
   }, [updateInfo])
 
   const onUpdate = useLockFn(async () => {
+    if (updateInfo?.managedByPacman) {
+      openUrlWithNotice(
+        `https://github.com/clash-verge-rev/clash-verge-rev/releases/tag/v${updateInfo.version}`,
+      )
+      return
+    }
     if (!updateInfo?.body) return
     if (breakChangeFlag) {
       showNotice.error('settings.modals.update.messages.breakChangeError')
@@ -347,7 +353,11 @@ export function UpdateViewer({ ref }: { ref?: Ref<DialogRef> }) {
         flexDirection: 'column',
         pb: 1,
       }}
-      okBtn={t('settings.modals.update.actions.update')}
+      okBtn={t(
+        updateInfo?.managedByPacman
+          ? 'settings.modals.update.actions.goToRelease'
+          : 'settings.modals.update.actions.update',
+      )}
       cancelBtn={t('shared.actions.cancel')}
       onClose={() => setOpen(false)}
       onCancel={() => {
@@ -361,6 +371,13 @@ export function UpdateViewer({ ref }: { ref?: Ref<DialogRef> }) {
       }}
       onOk={onUpdate}
     >
+      {updateInfo?.managedByPacman && (
+        <Alert severity="info" sx={{ mb: 2 }}>
+          {t('settings.modals.update.messages.pacman', {
+            packageName: `clash-verge-rev-${updateInfo.version.replaceAll('-', '_')}-1-x86_64.pkg.tar.zst`,
+          })}
+        </Alert>
+      )}
       <Box
         sx={{
           flex: 1,

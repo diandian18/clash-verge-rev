@@ -1221,6 +1221,7 @@ export interface TranslationResources {
           messages: {
             available: string
             breakChangeError: string
+            pacman: string
           }
           title: string
         }

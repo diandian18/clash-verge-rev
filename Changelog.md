@@ -17,6 +17,9 @@
 <details>
 <summary><strong> ✨ 新增功能 </strong></summary>
 
+**🐧 Linux**
+
+- Linux：新增 Arch Linux x86_64 安装包，支持通过 `pacman -U` 安装和升级
 
 </details>
 

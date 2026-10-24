@@ -672,6 +672,7 @@ export const translationKeys = [
   'settings.modals.update.actions.update',
   'settings.modals.update.messages.breakChangeError',
   'settings.modals.update.messages.available',
+  'settings.modals.update.messages.pacman',
   'settings.modals.update.alerts.note',
   'settings.modals.update.alerts.tip',
   'settings.modals.update.alerts.important',

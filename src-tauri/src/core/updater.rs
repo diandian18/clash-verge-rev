@@ -12,6 +12,22 @@ use std::{
 use tauri_plugin_updater::{Update, UpdaterExt as _};
 use tokio_util::sync::CancellationToken;
 
+pub fn is_pacman_package(app_handle: &tauri::AppHandle) -> bool {
+    #[cfg(target_os = "linux")]
+    {
+        use tauri::Manager as _;
+        app_handle
+            .path()
+            .resource_dir()
+            .is_ok_and(|path| path.join("pacman").is_file())
+    }
+    #[cfg(not(target_os = "linux"))]
+    {
+        let _ = app_handle;
+        false
+    }
+}
+
 pub struct SilentUpdater {
     update_ready: AtomicBool,
     manual_cancel: Mutex<Option<CancellationToken>>,
@@ -330,6 +346,11 @@ impl SilentUpdater {
 
     /// Installs a newer cached update before normal startup, if the user confirms.
     pub async fn try_install_on_startup(&self, app_handle: &tauri::AppHandle) -> bool {
+        if is_pacman_package(app_handle) {
+            self.discard_pending();
+            return false;
+        }
+
         if !Config::verge().await.latest_arc().auto_check_update.unwrap_or(true) {
             Self::delete_cache();
             return false;
@@ -431,6 +452,10 @@ impl SilentUpdater {
         version: &str,
         on_event: impl Fn(DownloadEvent) + Sync,
     ) -> Result<bool> {
+        anyhow::ensure!(
+            !is_pacman_package(app_handle),
+            "This package is managed by pacman. Download the Arch Linux package from the release page and install it with pacman -U."
+        );
         let cancel = CancellationToken::new();
         *self.manual_cancel.lock() = Some(cancel.clone());
         let prepared = tokio::select! {
@@ -681,6 +706,10 @@ impl SilentUpdater {
     }
 
     pub async fn start_background_check(&self, app_handle: tauri::AppHandle) {
+        if is_pacman_package(&app_handle) {
+            return;
+        }
+
         // Permanent watcher: daily update cycles for the lifetime of the app.
         logging!(info, Type::System, "Silent updater: background task started");
 

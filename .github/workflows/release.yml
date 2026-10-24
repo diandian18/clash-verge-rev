@@ -107,6 +107,7 @@ jobs:
           echo "TAG_NAME=$TAG_REF" >> $GITHUB_ENV
           VERSION=$(echo "$TAG_REF" | sed 's/^v//')
           echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "ARCH_PKGVER=${VERSION//-/_}" >> $GITHUB_ENV
           echo "DOWNLOAD_URL=https://github.com/clash-verge-rev/clash-verge-rev/releases/download/$TAG_REF" >> $GITHUB_ENV
         shell: bash
 
@@ -139,6 +140,9 @@ jobs:
 
           #### RPM包(Redhat系) 使用 dnf ./路径 安装
           - [64位](${{ env.DOWNLOAD_URL }}/Clash.Verge-${{ env.VERSION }}-1.x86_64.rpm) | [ARM64](${{ env.DOWNLOAD_URL }}/Clash.Verge-${{ env.VERSION }}-1.aarch64.rpm) | [ARMv7](${{ env.DOWNLOAD_URL }}/Clash.Verge-${{ env.VERSION }}-1.armhfp.rpm)
+
+          #### Arch Linux包 使用 pacman -U ./路径 安装
+          - [x86_64](${{ env.DOWNLOAD_URL }}/clash-verge-rev-${{ env.ARCH_PKGVER }}-1-x86_64.pkg.tar.zst)
 
           ### FAQ
           - [常见问题](https://clash-verge-rev.github.io/faq/windows.html)
@@ -270,6 +274,19 @@ jobs:
           args: --target ${{ matrix.target }}
           includeUpdaterJson: true
 
+      - name: Package Arch Linux x86_64
+        if: matrix.target == 'x86_64-unknown-linux-gnu'
+        run: bash scripts/package-arch.sh target/${{ matrix.target }}/release/bundle/deb/*.deb target/${{ matrix.target }}/release/bundle/arch
+
+      - name: Upload Arch Linux package
+        if: matrix.target == 'x86_64-unknown-linux-gnu'
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: ${{ github.ref_name }}
+          draft: true
+          fail_on_unmatched_files: true
+          files: target/${{ matrix.target }}/release/bundle/arch/*.pkg.tar.zst
+
       - name: Attest Windows bundles
         if: matrix.os == 'windows-latest'
         uses: actions/attest-build-provenance@v4
@@ -289,6 +306,7 @@ jobs:
           subject-path: |
             target/${{ matrix.target }}/release/bundle/deb/*.deb
             target/${{ matrix.target }}/release/bundle/rpm/*.rpm
+            target/${{ matrix.target }}/release/bundle/arch/*.pkg.tar.zst
 
   release-for-linux-arm:
     name: Release Build for Linux ARM
@@ -652,6 +670,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install jq
+          echo "ARCH_PKGVER=$(jq -r .version package.json | tr '-' '_')" >> $GITHUB_ENV
           echo "VERSION=$(cat package.json | jq '.version' | tr -d '"')" >> $GITHUB_ENV
           echo "DOWNLOAD_URL=https://github.com/clash-verge-rev/clash-verge-rev/releases/download/v$(cat package.json | jq '.version' | tr -d '"')" >> $GITHUB_ENV
           echo "BUILDTIME=$(TZ=Asia/Shanghai date)" >> $GITHUB_ENV
@@ -686,6 +705,9 @@ jobs:
 
           #### RPM包(Redhat系) 使用 dnf ./路径 安装
           - [64位](${{ env.DOWNLOAD_URL }}/Clash.Verge-${{ env.VERSION }}-1.x86_64.rpm) | [ARM64](${{ env.DOWNLOAD_URL }}/Clash.Verge-${{ env.VERSION }}-1.aarch64.rpm) | [ARMv7](${{ env.DOWNLOAD_URL }}/Clash.Verge-${{ env.VERSION }}-1.armhfp.rpm)
+
+          #### Arch Linux包 使用 pacman -U ./路径 安装
+          - [x86_64](${{ env.DOWNLOAD_URL }}/clash-verge-rev-${{ env.ARCH_PKGVER }}-1-x86_64.pkg.tar.zst)
 
           ### FAQ
           - [常见问题](https://clash-verge-rev.github.io/faq/windows.html)

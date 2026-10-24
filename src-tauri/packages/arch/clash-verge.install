@@ -1,0 +1,5 @@
+pre_remove() {
+    if ! /usr/bin/clash-verge-service-uninstall; then
+        printf '%s\n' 'Warning: Clash Verge service removal failed; check the service before reinstalling.' >&2
+    fi
+}

@@ -444,7 +444,8 @@
       },
       "messages": {
         "breakChangeError": "이 버전은 메이저 업데이트로 앱 내 업데이트를 지원하지 않습니다. 프로그램을 제거한 뒤 새 버전을 수동으로 설치하세요",
-        "available": "새 버전을 사용할 수 있습니다"
+        "available": "새 버전을 사용할 수 있습니다",
+        "pacman": "릴리스 페이지에서 x86_64 Arch Linux 패키지를 다운로드한 후 sudo pacman -U ./{{packageName}} 명령으로 업데이트하세요. 이 패키지는 앱 내 업데이트 설치를 지원하지 않습니다."
       },
       "alerts": {
         "note": "참고",

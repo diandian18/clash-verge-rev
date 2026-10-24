@@ -149,7 +149,13 @@ jobs:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         with:
           tauriScript: pnpm
-          args: --target ${{ matrix.target }} -b ${{ matrix.bundle }}
+          args: >-
+            --target ${{ matrix.target }} -b ${{ matrix.bundle }}
+            ${{ matrix.bundle == 'deb' && '--config src-tauri/tauri.arch-test.conf.json' || '' }}
+
+      - name: Package and verify Arch Linux x86_64
+        if: matrix.os == 'ubuntu-22.04' && github.event.inputs[matrix.input] == 'true'
+        run: bash scripts/package-arch.sh target/${{ matrix.target }}/release/bundle/deb/*.deb target/${{ matrix.target }}/release/bundle/arch
 
       - name: Upload Artifacts (macOS)
         if: matrix.os == 'macos-latest' && github.event.inputs[matrix.input] == 'true'
@@ -172,5 +178,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           archive: false
-          path: target/${{ matrix.target }}/release/bundle/deb/*.deb
+          path: |
+            target/${{ matrix.target }}/release/bundle/deb/*.deb
+            target/${{ matrix.target }}/release/bundle/arch/*.pkg.tar.zst
           if-no-files-found: error

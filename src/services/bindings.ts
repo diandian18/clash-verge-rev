@@ -23,6 +23,7 @@ export const commands = {
     __TAURI_INVOKE<string[]>('get_network_interfaces'),
   getSystemHostname: () => __TAURI_INVOKE<string>('get_system_hostname'),
   restartApp: () => __TAURI_INVOKE<null>('restart_app'),
+  isPacmanPackage: () => __TAURI_INVOKE<boolean>('is_pacman_package'),
   installUpdate: (version: string, onEvent: Channel<DownloadEvent>) =>
     __TAURI_INVOKE<boolean>('install_update', { version, onEvent }),
   cancelUpdateDownload: () => __TAURI_INVOKE<void>('cancel_update_download'),

@@ -444,7 +444,8 @@
       },
       "messages": {
         "breakChangeError": "Versi ini adalah pembaruan besar dan tidak mendukung pembaruan dalam aplikasi. Harap hapus instalasi dan unduh serta instal versi baru secara manual",
-        "available": "Versi baru tersedia"
+        "available": "Versi baru tersedia",
+        "pacman": "Unduh paket Arch Linux x86_64 dari halaman rilis, lalu perbarui dengan sudo pacman -U ./{{packageName}}. Instalasi dalam aplikasi dinonaktifkan untuk paket ini."
       },
       "alerts": {
         "note": "Catatan",

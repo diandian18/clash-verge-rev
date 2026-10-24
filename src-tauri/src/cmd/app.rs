@@ -57,6 +57,12 @@ pub async fn restart_app() -> CmdResult<()> {
 
 #[tauri::command]
 #[specta::specta]
+pub fn is_pacman_package(app_handle: AppHandle) -> bool {
+    crate::core::updater::is_pacman_package(&app_handle)
+}
+
+#[tauri::command]
+#[specta::specta]
 pub async fn install_update(
     app_handle: AppHandle,
     version: std::string::String,

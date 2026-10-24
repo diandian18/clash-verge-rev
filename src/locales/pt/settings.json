@@ -444,7 +444,8 @@
       },
       "messages": {
         "breakChangeError": "Esta versão é uma atualização importante e não oferece suporte a atualizações dentro do aplicativo. Desinstale-a e baixe e instale a nova versão manualmente",
-        "available": "Uma nova versão está disponível"
+        "available": "Uma nova versão está disponível",
+        "pacman": "Baixe o pacote x86_64 do Arch Linux na página da versão e atualize com sudo pacman -U ./{{packageName}}. A instalação pelo aplicativo está desativada para este pacote."
       },
       "alerts": {
         "note": "Nota",

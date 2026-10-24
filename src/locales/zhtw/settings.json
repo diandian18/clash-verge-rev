@@ -444,7 +444,8 @@
       },
       "messages": {
         "breakChangeError": "此版本為重大更新，不支援應用程式內更新，請解除安裝後手動下載安裝",
-        "available": "有新版本可用"
+        "available": "有新版本可用",
+        "pacman": "請前往發布頁下載 x86_64 Arch Linux 安裝套件，再執行 sudo pacman -U ./{{packageName}} 升級。此安裝套件不支援在應用程式內安裝更新。"
       },
       "alerts": {
         "note": "備註",

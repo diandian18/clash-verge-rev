@@ -1,0 +1,22 @@
+pkgname=clash-verge-rev
+pkgver=@PKGVER@
+pkgrel=1
+pkgdesc='A Clash Meta GUI based on Tauri'
+arch=('x86_64')
+url='https://github.com/clash-verge-rev/clash-verge-rev'
+license=('GPL-3.0-only')
+depends=('glibc' 'gcc-libs' 'gtk3' 'webkit2gtk-4.1' 'libayatana-appindicator' 'openssl' 'polkit' 'hicolor-icon-theme' 'desktop-file-utils')
+provides=('clash-verge')
+conflicts=('clash-verge' 'clash-verge-rev-bin' 'clash-verge-rev-git')
+options=('!strip' '!debug')
+install=clash-verge.install
+source=('clash-verge.deb')
+sha256sums=('@SHA256@')
+
+package() {
+    bsdtar -xf "$srcdir"/data.tar.* -C "$pkgdir"
+    chmod 755 "$pkgdir/usr/bin/"{clash-verge,clash-verge-service,clash-verge-service-install,clash-verge-service-uninstall,verge-mihomo,verge-mihomo-alpha}
+    test -d "$pkgdir/usr/lib/Clash Verge/resources"
+    # The Debian binary still identifies itself as a deb to Tauri's updater.
+    install -Dm644 /dev/null "$pkgdir/usr/lib/Clash Verge/pacman"
+}

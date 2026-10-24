@@ -100,6 +100,38 @@ Fast build for testing:
 pnpm build:fast
 ```
 
+### Arch Linux Package (x86_64)
+
+After building the Linux x86_64 Debian package, run the following on a Linux host
+with Docker and `dpkg-deb` installed:
+
+```bash
+bash scripts/package-arch.sh target/x86_64-unknown-linux-gnu/release/bundle/deb/Clash.Verge_2.5.9_amd64.deb target/x86_64-unknown-linux-gnu/release/bundle/arch
+sudo pacman -U ./target/x86_64-unknown-linux-gnu/release/bundle/arch/clash-verge-rev-2.5.9-1-x86_64.pkg.tar.zst
+```
+
+Replace the version in the example with the version being built. The packaging
+script builds with `makepkg` in an Arch Linux container, installs the package to
+check file integrity and runtime library dependencies, then removes it and checks
+that its files and package registration are gone. The release workflow uploads
+the resulting package alongside the Debian and RPM packages. Pre-release version
+hyphens are replaced with underscores in Arch package versions.
+
+Arch packages retain update checks, but disable automatic downloads and in-app
+installation. Download a newer `.pkg.tar.zst` from its release page and upgrade
+with `pacman -U`. Removing the package uninstalls its service; package upgrades
+preserve the existing service registration.
+
+To verify this flow without publishing a release, dispatch the **Development Test**
+workflow with only **run_linux_amd64** enabled. It builds the Debian package, runs
+the same Arch packaging and installation checks, and uploads both packages as
+workflow artifacts.
+
+The **Arch Linux Package** workflow also runs when pushing the
+`codex/arch-linux-packaging` verification branch. Both test workflows disable
+updater signing for the Linux test package, so a fork does not need the upstream
+release signing key. Release builds continue to use updater signing.
+
 ### Clean Build
 
 ```bash

@@ -1,0 +1,72 @@
+name: Arch Linux Package
+
+on:
+  push:
+    branches:
+      - codex/arch-linux-packaging
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  CARGO_INCREMENTAL: 0
+  RUST_BACKTRACE: short
+  HUSKY: 0
+
+concurrency:
+  group: arch-package-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  package:
+    name: Build, install and remove x86_64 package
+    runs-on: ubuntu-22.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install Linux dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libxslt1.1 libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev patchelf
+
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: '1.99.1'
+          targets: x86_64-unknown-linux-gnu
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: . -> target
+          key: arch-linux-x86_64
+
+      - uses: pnpm/action-setup@v6
+        with:
+          run_install: false
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24.22.1'
+          cache: pnpm
+
+      - name: Prepare application
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm run prebuild x86_64-unknown-linux-gnu
+
+      - name: Build Debian package without updater signing
+        run: pnpm build --target x86_64-unknown-linux-gnu --bundles deb --config src-tauri/tauri.arch-test.conf.json
+
+      - name: Build and verify Arch Linux package
+        run: bash scripts/package-arch.sh target/x86_64-unknown-linux-gnu/release/bundle/deb/*.deb target/x86_64-unknown-linux-gnu/release/bundle/arch
+
+      - name: Upload Arch Linux package
+        uses: actions/upload-artifact@v7
+        with:
+          name: clash-verge-rev-arch-x86_64
+          archive: false
+          path: target/x86_64-unknown-linux-gnu/release/bundle/arch/*.pkg.tar.zst
+          if-no-files-found: error
